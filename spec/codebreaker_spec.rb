@@ -20,16 +20,13 @@ module Codebreaker
       end
     end
 
-    context 'const' do
-      it 'get const' do
-        expect(Game::NUMBER_ATTEMPTS).to eq(3)
-        expect(Game::HINTS).to eq(1)
-      end
-    end
-
     context '#guess' do
+      before do
+        game.difficulty(:hell, 5, 1)
+      end
+
       it 'reduce attempts number by 1' do
-        expect { game.guess('1234') }.to change { game.attempts }.by(-1)
+        expect { game.guess('1234') }.to change { game.instance_variable_get(:@attempts) }.by(-1)
       end
 
       it '@code Array' do
@@ -40,7 +37,7 @@ module Codebreaker
 
     context '#exit_with_status' do
       before do
-        game.exit_with_status('message')
+        game.send(:exit_with_status('message'))
       end
 
       it 'message' do

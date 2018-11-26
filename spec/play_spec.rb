@@ -1,9 +1,11 @@
 require './play.rb'
+require './modules/codebreaker.rb'
 require 'simplecov'
 SimpleCov.start
 
 RSpec.describe Play do
   subject(:play) { Play.new }
+  subject(:game) { Codebreaker::Game.new }
 
   context '#play_again' do
     before do
@@ -31,26 +33,21 @@ RSpec.describe Play do
     it 'look statisctics' do
       allow(File).to receive(:open)
       allow(play).to receive(:gets).and_return('y')
-      expect { play.send(:statisctics) }.to output("Would you like look statisctics? (y,n)\n").to_stdout
+      play.send(:statisctics)
     end
   end
 
   context '#save' do
     before do
-      allow(play).to receive(:gets).and_return('y')
-    end
-
-    it 'ask about save statistics' do
-      expect { play.send(:save) }.to output(/Would you like to save game result?/).to_stdout
+      allow(play).to receive(:name).and_return('Test')
+      allow(game).to receive(:statistik).and_return('Test')
     end
 
     it 'call #save method' do
-      allow(play).to receive(:puts)
       play.send(:save)
     end
 
     it 'statistics should exist' do
-      allow(play).to receive(:puts)
       play.send(:save)
       expect(File.exist?('./statisctics.txt')).to eq(true)
     end

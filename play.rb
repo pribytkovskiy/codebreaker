@@ -7,16 +7,57 @@ class Play
     @game = Game.new
   end
 
+  def introduction
+    puts "Welcome! Enter comand 'start', 'rules', 'stats', 'exit'."
+    while @game.exit? != true
+      case gets.chomp
+      when 'start'
+        play_game
+      when 'exit'
+        return
+      when 'stats'
+        statisctics
+      when 'rules'
+        File.open('./rules.txt', 'r') { |f| puts f.read }
+      else
+        puts 'You have passed unexpected command. Please choose one from listed commands.'
+      end
+    end
+  end
+
+  private
+
+  def difficulty
+    exit = false
+    puts "Please enter level
+          easy - 15 attempts. 2 hints
+          medium - 10 attempts. 1 hint
+          hell - 5 attempts. 1 hint"
+    while exit != true
+      case gets.chomp
+      when 'easy'
+        @game.difficulty(:easy, 15, 2)
+        exit = true
+      when 'medium'
+        @game.difficulty(:medium, 10, 1)
+        exit = true
+      when 'hell'
+        @game.difficulty(:hell, 5, 1)
+        exit = true
+      else
+        puts 'You should enter: easy, medium, hell'
+      end
+    end
+  end
+
   def play_game
-    @game.difficulty
-    puts 'Codebreaker! Make a guess of 4 numbers from 1 to 6.'
-    puts "Enter code or comand 'hint' to hint, 'exit' to exit."
+    difficulty
+    name
+    puts "Codebreaker! Make a guess of 4 numbers from 1 to 6. Enter code or comand 'hint' to hint."
     while @game.exit? != true
       case code = gets.chomp
       when 'hint'
         puts @game.hint
-      when 'exit'
-        return
       when /\A[1-6]{4}\Z/
         puts @game.guess(code)
       else
@@ -24,11 +65,13 @@ class Play
       end
     end
     save
-    statisctics
     play_again
   end
 
-  private
+  def name
+    puts 'Your name.'
+    @name = gets.chomp
+  end
 
   def play_again
     puts 'Would you like to play again? (y/n)'
@@ -38,18 +81,10 @@ class Play
   end
 
   def statisctics
-    puts 'Would you like look statisctics? (y,n)'
-    return unless gets.chomp == 'y'
-
     File.open('./statisctics.txt', 'r') { |f| puts f.read }
   end
 
   def save
-    puts 'Would you like to save game result? (y/n)'
-    return unless gets.chomp == 'y'
-
-    puts 'Your name'
-    @name = gets.chomp
     File.open('./statisctics.txt', 'a') do |f|
       f.puts @name, @game.statistik, Time.now
       f.puts '------------------------------'
@@ -57,4 +92,4 @@ class Play
   end
 end
 
-Play.new.play_game
+#Play.new.introduction
