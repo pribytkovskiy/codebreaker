@@ -3,6 +3,8 @@ require './modules/codebreaker.rb'
 class Play
   include Codebreaker
 
+  attr_reader :game
+
   def initialize
     @game = Game.new
   end
@@ -14,6 +16,7 @@ class Play
       when 'start'
         play_game
       when 'exit'
+        puts 'Goodbye message!'
         return
       when 'stats'
         statisctics

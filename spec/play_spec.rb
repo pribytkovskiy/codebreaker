@@ -5,7 +5,6 @@ SimpleCov.start
 
 RSpec.describe Play do
   subject(:play) { Play.new }
-  subject(:game) { Codebreaker::Game.new }
 
   context '#play_again' do
     before do
@@ -39,8 +38,8 @@ RSpec.describe Play do
 
   context '#save' do
     before do
-      allow(play).to receive(:name).and_return('Test')
-      allow(game).to receive(:statistik).and_return('Test')
+      allow(play).to receive(:name).and_return('Petr')
+      play.game.difficulty(:hell, 5, 1)
     end
 
     it 'call #save method' do

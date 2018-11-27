@@ -37,7 +37,7 @@ module Codebreaker
 
     context '#exit_with_status' do
       before do
-        game.send(:exit_with_status('message'))
+        game.send(:exit_with_status, 'message')
       end
 
       it 'message' do
@@ -49,24 +49,25 @@ module Codebreaker
       end
     end
 
-    context '#win' do
+    context '#check_win' do
       it 'when win' do
         game.instance_variable_set(:@secret_code, [1, 2, 3, 4])
         game.instance_variable_set(:@code, [1, 2, 3, 4])
-        expect(game.win).to eq('Congratulations, you win!')
+        expect(game.send(:check_win)).to eq('Congratulations, you win!')
       end
     end
 
-    context '#no_attempts' do
+    context '#check_attempts' do
       it 'when game over' do
         game.instance_variable_set(:@attempts, 0)
-        expect(game.no_attempts).to eq('Game over! You have no more attempts')
+        expect(game.send(:check_attempts)).to eq('Game over! You have no more attempts')
       end
     end
 
     context '#hint' do
       it 'reduce hint number by 1' do
-        expect { game.hint }.to change { game.hints }.by(-1)
+        game.instance_variable_set(:@hints, 2)
+        expect { game.hint }.to change { game.instance_variable_get(:@hints) }.by(-1)
       end
 
       it "You don't have any hints." do
@@ -75,6 +76,7 @@ module Codebreaker
       end
 
       it 'return one number of secret code' do
+        game.instance_variable_set(:@hints, 1)
         expect(game.instance_variable_get(:@secret_code)).to include(game.hint)
       end
     end
@@ -92,7 +94,7 @@ module Codebreaker
           game.instance_variable_set(:@secret_code, item[0])
           game.instance_variable_set(:@exit, false)
           game.instance_variable_set(:@code, item[1])
-          expect(game.mark).to eq(item[2])
+          expect(game.send(:mark)).to eq(item[2])
         end
       end
     end
@@ -106,6 +108,7 @@ module Codebreaker
 
     context '#statistik' do
       it 'return statistik' do
+        game.difficulty(:hell, 5, 1)
         expect(game.statistik).to be_is_a(String)
       end
     end
