@@ -7,16 +7,16 @@ RSpec.describe Play do
 
   context '# introduction' do
     before(:each) do
-    #  allow(subject.instance_variable_get(:@game)).to receive(:exit?).and_return(true)
-       allow(subject.game).to receive(:exit?).and_return(true)
+      #allow(subject.instance_variable_get(:@game)).to receive(:exit?).and_return(true)
+      allow(subject.game).to receive(:exit?).and_return(true)
     end
 
     it 'puts Welcome' do
-      allow(subject.introduction).to receive(:gets).and_return('exit')
+      allow(subject).to receive(:gets).and_return('exit')
       expect { subject.introduction }.to output(/Welcome! Enter comand 'start', 'rules', 'stats', 'exit'./).to_stdout
     end
 
-    it 'unexpected command' do
+    xit 'unexpected command' do
       allow(subject).to receive(:gets).and_return('srartttt')
       expect { subject.introduction }.to output(/You have passed unexpected command. Please choose one from listed commands./).to_stdout
     end
