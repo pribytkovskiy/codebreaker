@@ -1,6 +1,5 @@
+require 'spec_helper'
 require './modules/codebreaker.rb'
-require 'simplecov'
-SimpleCov.start
 
 module Codebreaker
   RSpec.describe Codebreaker do
