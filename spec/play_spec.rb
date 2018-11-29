@@ -5,7 +5,7 @@ require './modules/codebreaker.rb'
 RSpec.describe Play do
   let(:subject) { described_class.new }
 
-  context '# introduction' do
+  context '#introduction' do
     before(:each) do
       #allow(subject.instance_variable_get(:@game)).to receive(:exit?).and_return(true)
       allow(subject.game).to receive(:exit?).and_return(true)

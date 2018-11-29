@@ -73,7 +73,15 @@ class Play
 
   def name
     puts 'Your name.'
-    @name = gets.chomp
+    exit = false
+    while exit != true
+      @name = gets.chomp
+      if (@name.length >= 3) && (@name.length <= 20) && (@name.is_a? String)
+        exit = true
+      else
+        puts 'String, required, min length - 3 symbols, max length - 20 symbols.'
+      end
+    end
   end
 
   def play_again

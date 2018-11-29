@@ -1,6 +1,5 @@
 module Codebreaker
   class Game
-
     def initialize
       @secret_code = random
       @exit = false
