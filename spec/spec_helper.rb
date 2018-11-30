@@ -17,9 +17,9 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.around do |example|
-    Timeout.timeout(10) do
-      example.run
-    end
-  end
+  #config.around do |example|
+  #  Timeout.timeout(10) do
+  #    example.run
+  #  end
+  #end
 end
