@@ -54,10 +54,19 @@ module Codebreaker
         expect(subject.instance_variable_get(:@code)).to eq([1, 2, 3, 4])
       end
 
-      context '#check_win' do
+      xcontext '#check_win' do
         it 'when win' do
           subject.instance_variable_set(:@secret_code, [1, 2, 3, 4])
           expect(subject.guess('1234')).to eq('Congratulations, you win!')
+        end
+      end
+
+      context '#check_attempts' do
+        it 'when game over' do
+          subject.instance_variable_set(:@attempts, 0)
+          allow(subject).to receive(:check_attempts)
+          allow(subject).to receive(:mark)
+          expect(subject.guess('1234')).to eq('Game over! You have no more attempts')
         end
       end
     end

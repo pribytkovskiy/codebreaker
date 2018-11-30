@@ -12,7 +12,7 @@ class Play
   def introduction
     puts "Welcome! Enter comand 'start', 'rules', 'stats', 'exit'."
     while @game.exit? != true
-      case gets.chomp
+      case @code = gets.chomp
       when 'start'
         play_game
       when 'exit'

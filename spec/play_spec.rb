@@ -6,26 +6,36 @@ RSpec.describe Play do
   let(:subject) { described_class.new }
 
   context '#introduction' do
-    #before(:each) do
-      #allow(subject.instance_variable_get(:@game)).to receive(:exit?).and_return(true)
-      #allow(subject.game).to receive(:exit?).and_return(true)
-      #allow(subject).to receive(:while).and_yield
-    #end
-
     it 'puts Welcome' do
       allow(subject).to receive(:gets).and_return('exit')
       expect { subject.introduction }.to output(/Welcome! Enter comand 'start', 'rules', 'stats', 'exit'./).to_stdout
     end
 
+    it 'gets Goodbye' do
+      allow(subject).to receive(:gets).and_return('exit')
+      expect { subject.introduction }.to output(/Goodbye message!/).to_stdout
+    end
+
     it 'unexpected command' do
-      allow(subject).to receive(:gets).and_return('srartttt')
-      allow(subject).to receive(:while).and_yield
-      expect { subject.introduction }.to output(/You have passed unexpected command. Please choose one from listed commands./).to_stdout    end
+      allow(subject).to receive(:gets) do
+        @counter ||= 0
+        response = if @counter > 1
+                     'exit'
+                   else
+                     'startttt'
+                   end
+        @counter += 1
+        response
+      end
+      expect { subject.introduction }.to output(/You have passed unexpected command. Please choose one from listed commands./).to_stdout
+    end
 
     xit 'gets start' do
+      allow(subject).to receive(:difficulty)
       allow(subject).to receive(:gets).and_return('start')
+      allow(subject.introduction).to receive(:loop).and_yield
       expect { subject.introduction }.to output(/Please enter level/).to_stdout
-    end    
+    end
   end
 
   context '#play_again' do
@@ -69,7 +79,7 @@ RSpec.describe Play do
     end
 
     it 'statistics should exist' do
-     subject.send(:save)
+      subject.send(:save)
       expect(File.exist?('./statisctics.txt')).to eq(true)
     end
   end

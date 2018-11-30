@@ -3,6 +3,7 @@ SimpleCov.start do
   add_filter '/spec/'
   minimum_coverage 80
 end
+require 'timeout'
 require "bundler/setup"
 
 RSpec.configure do |config|
@@ -14,5 +15,11 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.around do |example|
+    Timeout.timeout(10) do
+      example.run
+    end
   end
 end
