@@ -1,10 +1,8 @@
 require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/'
-  minimum_coverage 80
+  minimum_coverage 60
 end
-require 'timeout'
-require "bundler/setup"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -16,10 +14,4 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
-
-  #config.around do |example|
-  #  Timeout.timeout(10) do
-  #    example.run
-  #  end
-  #end
 end

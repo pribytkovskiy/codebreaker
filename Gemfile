@@ -7,4 +7,4 @@ gem 'fasterer', '~> 0.4.1'
 gem 'overcommit'
 gem 'rspec'
 gem 'rubocop', '~> 0.60.0'
-gem 'simplecov', require: false
+gem 'simplecov', require: false, group: :test

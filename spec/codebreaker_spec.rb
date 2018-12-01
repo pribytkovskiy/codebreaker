@@ -1,5 +1,6 @@
 require 'spec_helper'
 require './modules/codebreaker.rb'
+require 'pry'
 
 module Codebreaker
   RSpec.describe Codebreaker::Game do
@@ -16,9 +17,9 @@ module Codebreaker
     end
 
     context '#exit?' do
-      it 'return false if no attempts' do
+      it 'return true if @exit eq true' do
         subject.instance_variable_set(:@exit, true)
-        expect(subject.exit?).to eq(true)   
+        expect(subject.exit?).to eq(true)
       end
     end
 
@@ -54,58 +55,52 @@ module Codebreaker
         expect(subject.instance_variable_get(:@code)).to eq([1, 2, 3, 4])
       end
 
-      xcontext '#check_win' do
-        it 'when win' do
+      context '#check_win' do
+        it 'when win @exit eq true' do
           subject.instance_variable_set(:@secret_code, [1, 2, 3, 4])
-          expect(subject.guess('1234')).to eq('Congratulations, you win!')
-        end
-      end
-
-      xcontext '#check_attempts' do
-        it 'when game over' do
-          subject.instance_variable_set(:@attempts, 0)
-          allow(subject).to receive(:check_attempts)
-          allow(subject).to receive(:mark)
-          expect(subject.guess('1234')).to eq('Game over! You have no more attempts')
-        end
-
-        it 'if call exit_with_status @exit = true' do
-          subject.instance_variable_set(:@attempts, 0)
           subject.guess('1234')
           expect(subject.instance_variable_get(:@exit)).to eq(true)
         end
       end
 
-    context '#start' do
-      it 'saves secret code' do
-        expect(subject.instance_variable_get(:@secret_code)).not_to be_empty
-      end
-
-      it 'saves 4 numbers secret code' do
-        expect(subject.instance_variable_get(:@secret_code).size).to eq(4)
-      end
-
-      it 'saves secret code with numbers from 1 to 6' do
-        expect(subject.instance_variable_get(:@secret_code).join).to match(/\A[1-6]{4}\Z/)
-      end
-    end
-
-    context '#game' do
-      [[[1, 2, 2, 1], '2332', '--'], [[1, 2, 1, 1], '1121', '++--'],
-       [[1, 2, 2, 2],  '2335', '-'],    [[1, 5, 5, 1], '1124', '+-'],
-       [[5, 6, 5, 6],  '1221', ''],     [[4, 4, 1, 5], '5514', '+--'],
-       [[1, 1, 1, 0],  '1111', '+++'], [[1, 2, 3, 4], '4321]', '----'],
-       [[5, 5, 1, 4],  '4415', '+--'],  [[1, 2, 1, 1], '2112', '+--'],
-       [[3, 1, 3, 1],  '1313', '----'], [[1, 2, 3, 4], '1255', '++'],
-       [[3, 4, 1, 1],  '1124', '---'],  [[5, 5, 5, 1], '5133', '+-'],
-       [[1, 4, 1, 5],  '4115', '++--'], [[2, 3, 1, 5], '4115', '++']].each do |item|
-        it "Secret code is #{item[0]}, guess #{item[1]}, return #{item[2]}" do
-          subject.instance_variable_set(:@secret_code, item[0])
-          subject.instance_variable_set(:@exit, false)
-          expect(subject.guess(item[1])).to eq(item[2])
+      context '#check_attempts' do
+        it 'when game over @exit eq true' do
+          subject.instance_variable_set(:@attempts, 1)
+          subject.guess('1234')
+          expect(subject.instance_variable_get(:@exit)).to eq(true)
         end
       end
-    end
+
+      context 'secret_code' do
+        it 'saves secret code' do
+          expect(subject.instance_variable_get(:@secret_code)).not_to be_empty
+        end
+
+        it 'saves 4 numbers secret code' do
+          expect(subject.instance_variable_get(:@secret_code).size).to eq(4)
+        end
+
+        it 'saves secret code with numbers from 1 to 6' do
+          expect(subject.instance_variable_get(:@secret_code).join).to match(/\A[1-6]{4}\Z/)
+        end
+      end
+
+      context '#mark' do
+        [[[1, 2, 2, 1], '2332', '--'], [[1, 2, 1, 1], '1121', '++--'],
+         [[1, 2, 2, 2],  '2335', '-'],    [[1, 5, 5, 1], '1124', '+-'],
+         [[5, 6, 5, 6],  '1221', ''],     [[4, 4, 1, 5], '5514', '+--'],
+         [[1, 1, 1, 0],  '1111', '+++'], [[1, 2, 3, 4], '4321]', '----'],
+         [[5, 5, 1, 4],  '4415', '+--'],  [[1, 2, 1, 1], '2112', '+--'],
+         [[3, 1, 3, 1],  '1313', '----'], [[1, 2, 3, 4], '1255', '++'],
+         [[3, 4, 1, 1],  '1124', '---'],  [[5, 5, 5, 1], '5133', '+-'],
+         [[1, 4, 1, 5],  '4115', '++--'], [[2, 3, 1, 5], '4115', '++']].each do |item|
+          it "Secret code is #{item[0]}, guess #{item[1]}, return #{item[2]}" do
+            subject.instance_variable_set(:@secret_code, item[0])
+            subject.instance_variable_set(:@exit, false)
+            expect(subject.guess(item[1])).to eq(item[2])
+          end
+        end
+      end
     end
 
     context '#hint' do
