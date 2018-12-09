@@ -1,6 +1,5 @@
 require 'spec_helper'
-require './play.rb'
-require './modules/codebreaker.rb'
+require './modules/console.rb'
 
 RSpec.describe Console do
   let(:subject) { described_class.new }

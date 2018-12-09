@@ -1,3 +1,5 @@
+require 'i18n'
+
 module Codebreaker
   class Game
     def initialize
