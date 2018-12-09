@@ -114,24 +114,4 @@ RSpec.describe Console do
       expect { subject.send(:play_again) }.to change { subject.instance_variable_get(:@game) }
     end
   end
-
-  context '#statisctics' do
-    it 'look statisctics' do
-      allow(File).to receive(:open)
-      allow(subject).to receive(:gets).and_return('y')
-      subject.send(:statisctics)
-    end
-  end
-
-  context '#save' do
-    before do
-      allow(subject).to receive(:name).and_return('Petr')
-      subject.game.difficulty(:hell, 5, 1)
-    end
-
-    it 'statistics should exist' do
-      subject.send(:save)
-      expect(File.exist?('./db/statisctics.txt')).to eq(true)
-    end
-  end
 end

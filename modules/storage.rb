@@ -4,7 +4,6 @@ module Codebreaker
     PATH_STATS = './db/statisctics.txt'.freeze
 
     class << self
-      private
 
       def statisctics
         if File.file?(PATH_STATS.to_s)
