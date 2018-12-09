@@ -1,3 +1,4 @@
+require 'spec_helper'
 require './auto_load.rb'
 
 module Codebreaker
