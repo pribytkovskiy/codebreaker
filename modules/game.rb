@@ -5,10 +5,10 @@ module Codebreaker
       @exit = false
     end
 
-    def difficulty(level, attempts, hints)
-      @total_attempts = @attempts = attempts
-      @total_hints = @hints = hints
-      @level = level
+    def difficulty(difficult)
+      @total_attempts = @attempts = difficult[:attempts]
+      @total_hints = @hints = difficult[:hints]
+      @level = difficult[:level]
     end
 
     def exit?
@@ -29,10 +29,11 @@ module Codebreaker
     end
 
     def hint
-      return "You don't have any hints." if @hints.zero?
+      return I18n.t(:no_hint) if @hints.zero?
 
       @hints -= 1
-      @secret_code.sample
+      @hint_array ||= @secret_code.shuffle
+      @hint_array.pop
     end
 
     private
@@ -47,11 +48,11 @@ module Codebreaker
     end
 
     def check_win
-      return exit_with_status('Congratulations, you win!') if @code == @secret_code
+      return exit_with_status(I18n.t(:win)) if @code == @secret_code
     end
 
     def check_attempts
-      return exit_with_status('Game over! You have no more attempts') if @attempts.zero?
+      return exit_with_status(I18n.t(:no_attempts)) if @attempts.zero?
     end
 
     def mark

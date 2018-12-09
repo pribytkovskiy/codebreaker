@@ -2,7 +2,7 @@ require 'spec_helper'
 require './play.rb'
 require './modules/codebreaker.rb'
 
-RSpec.describe Play do
+RSpec.describe Console do
   let(:subject) { described_class.new }
 
   context '#introduction' do

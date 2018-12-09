@@ -1,0 +1,22 @@
+en:
+  welcome: "Welcome! Enter comand 'start', 'rules', 'stats', 'exit'."
+  goodbye: 'Goodbye message!'
+  unexpected_command: 'You have passed unexpected command. Please choose one from listed commands.'
+  level: "Please enter level easy - 15 attempts. 2 hints medium - 10 attempts. 1 hint hell - 5 attempts. 1 hint"
+  unexpected_level: 'You should enter: easy, medium, hell'
+  enter_code: "Codebreaker! Make a guess of 4 numbers from 1 to 6. Enter code or comand 'hint' to hint."
+  unexpected_code: 'You should make a guess of 4 numbers from 1 to 6.'
+  name: 'Your name.'
+  play_again: 'Would you like to play again? (y/n)'
+  no_file: 'No statistics file'
+  start_command: 'start'
+  exit_command: 'exit'
+  stats_command: 'stats'
+  rules_command: 'rules'
+  easy_level: 'easy'
+  hell_level: 'hell'
+  medium_level: 'medium'
+  hint: 'hint'
+  no_hint: "You don't have any hints."
+  win: 'Congratulations, you win!'
+  no_attempts: 'Game over! You have no more attempts'
