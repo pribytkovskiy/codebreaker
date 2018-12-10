@@ -4,7 +4,19 @@ require './modules/console.rb'
 
 module Codebreaker
   RSpec.describe Codebreaker::Console do
-    let(:subject) { described_class.new }
+    subject { described_class.new }
+    let(:exit) { 'exit' }
+    let(:start) { 'start' }
+    let(:bad_command) { 'startttt' }
+    let(:level) { 'hell' }
+    let(:name) { 'Dima' }
+    let(:hint) { 'hint' }
+    let(:bad_code) { '12345' }
+    let(:code) { '1234' }
+    let(:stats) { 'stats' }
+    let(:rules) { 'rules' }
+    let(:easy) { 'easy' }
+    let(:medium) { 'medium' }
 
     context '#start' do
       it 'puts welcome and goodbye' do
@@ -18,9 +30,9 @@ module Codebreaker
           allow(subject).to receive(:gets) do
             @counter ||= 0
             response = if @counter > 1
-                         'exit'
+                         exit
                        else
-                         'startttt'
+                         bad_command
                        end
             @counter += 1
             response
@@ -32,19 +44,19 @@ module Codebreaker
           allow(subject).to receive(:gets) do
             @counter ||= 0
             response = if @counter == 0
-                         'start'
+                         start
                        elsif @counter == 1
-                         'hell'
+                         level
                        elsif @counter == 2
-                         'Dima'
+                         name
                        elsif @counter == 3
-                         'hint'
+                         hint
                        elsif @counter == 4
-                         '12345'
+                         bad_code
                        elsif @counter > 10
-                         'y'   
+                         'y'
                        elsif @counter > 4
-                         '1234'  
+                         code 
                        end
             @counter += 1
             response
@@ -61,9 +73,9 @@ module Codebreaker
       allow(subject).to receive(:gets) do
         @counter ||= 0
         response = if @counter > 1
-                     'exit'
+                     exit
                    else
-                     'stats'
+                     stats
                    end
         @counter += 1
         response
@@ -75,9 +87,9 @@ module Codebreaker
       allow(subject).to receive(:gets) do
         @counter ||= 0
         response = if @counter > 1
-                     'exit'
+                     exit
                    else
-                     'rules'
+                     rules
                    end
         @counter += 1
         response
@@ -86,12 +98,12 @@ module Codebreaker
     end
 
     it 'difficulty easy' do
-      allow(subject).to receive(:gets).and_return('easy')
+      allow(subject).to receive(:gets).and_return(easy)
       expect { subject.send(:difficulty) }.to output(/Please enter level easy - 15 attempts. 2 hints medium - 10 attempts. 1 hint hell - 5 attempts. 1 hint/).to_stdout
     end
 
     it 'difficulty medium' do
-      allow(subject).to receive(:gets).and_return('medium')
+      allow(subject).to receive(:gets).and_return(medium)
       expect { subject.send(:difficulty) }.to output(/Please enter level easy - 15 attempts. 2 hints medium - 10 attempts. 1 hint hell - 5 attempts. 1 hint/).to_stdout
     end
 
@@ -99,9 +111,9 @@ module Codebreaker
       allow(subject).to receive(:gets) do
         @counter ||= 0
         response = if @counter > 1
-                     'medium'
+                     medium
                    else
-                     'bad'
+                     bad_command
                    end
         @counter += 1
         response
@@ -111,7 +123,7 @@ module Codebreaker
 
     context '#name' do
       it 'ask name' do
-        allow(subject).to receive(:gets).and_return('Petr')
+        allow(subject).to receive(:gets).and_return(name)
         expect { subject.send(:name) }.to output(/Your name./).to_stdout
       end
 
@@ -122,7 +134,7 @@ module Codebreaker
 
       it 'get good name' do
         allow(subject).to receive(:puts)
-        allow(subject).to receive(:gets).and_return('Petr')
+        allow(subject).to receive(:gets).and_return(name)
         expect(subject.send(:name)).to eq(nil)
       end
     end
