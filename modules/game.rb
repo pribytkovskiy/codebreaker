@@ -1,23 +1,21 @@
-require 'i18n'
-
 module Codebreaker
   class Game
     def initialize
       @secret_code = random
-      @exit = false
+      @end_game = false
     end
 
-    def difficulty(difficult)
-      @total_attempts = @attempts = difficult[:attempts]
-      @total_hints = @hints = difficult[:hints]
-      @level = difficult[:level]
+    def difficulty(difficulty)
+      @total_attempts = @attempts = difficulty[:attempts]
+      @total_hints = @hints = difficulty[:hints]
+      @level = difficulty[:level]
     end
 
-    def exit?
-      @exit
+    def end_game?
+      @end_game
     end
 
-    def statistik
+    def statistics
       "Status: #{@status}, level: #{@level}, secret code: #{@secret_code}, attempts total: #{@total_attempts},
       attempts used: #{@total_attempts - @attempts}, hints total:#{@total_hints}, hints used: #{@total_hints - @hints}"
     end
@@ -45,7 +43,7 @@ module Codebreaker
     end
 
     def exit_with_status(message)
-      @exit = true
+      @end_game = true
       @status = message
     end
 
@@ -84,7 +82,7 @@ module Codebreaker
         @array_secret_code[index] = nil
         @answer << '-'
       end
-      @answer.join if @exit == false
+      @answer.join if @end_game == false
     end
   end
 end

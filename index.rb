@@ -1,3 +1,3 @@
-require './modules/console.rb'
+require './auto_load'
 
 Codebreaker::Console.new.start

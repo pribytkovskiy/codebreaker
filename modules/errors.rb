@@ -1,13 +1,14 @@
 module Errors
-  class NameNoStringError < StandardError
+  class WrongClassError < StandardError
     def initialize
-      super('Name no string!')
+      super("Wrong class! #{obj} class not #{klass}")
     end
   end
 
-  class NameLengthError < StandardError
+  class LengthError < StandardError
+    LENGTH_ERROR = 'Length between 3 - 20 chars'.freeze
     def initialize
-      super('Name length between 3 - 20 chars')
+      super(LENGTH_ERROR)
     end
   end
 end
