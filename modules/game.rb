@@ -1,5 +1,10 @@
 module Codebreaker
   class Game
+    attr_reader :secret_code, :end_game
+
+    RANGE_FOR_SECRET_CODE = (1..6).freeze
+    SIGNS_FOR_SECRET_CODE = (1..4).freeze
+
     def initialize
       @secret_code = random
       @end_game = false
@@ -39,7 +44,7 @@ module Codebreaker
     private
 
     def random
-      (1..4).map { rand(1..6) }
+      SIGNS_FOR_SECRET_CODE.map { rand(RANGE_FOR_SECRET_CODE) }
     end
 
     def exit_with_status(message)

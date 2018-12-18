@@ -20,3 +20,5 @@ en:
   no_hint: "You don't have any hints."
   win: 'Congratulations, you win!'
   no_attempts: 'Game over! You have no more attempts'
+  wrong_class: "Wrong class! #{obj} class not #{klass}"
+  length_error: 'Length between 3 - 20 chars'

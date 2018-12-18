@@ -1,157 +1,105 @@
 require 'spec_helper'
-require './auto_load.rb'
-require './modules/console.rb'
 
 module Codebreaker
   RSpec.describe Codebreaker::Console do
-    subject { described_class.new }
-    let(:exit) { 'exit' }
-    let(:start) { 'start' }
-    let(:bad_command) { 'startttt' }
-    let(:level) { 'hell' }
-    let(:name) { 'Dima' }
-    let(:hint) { 'hint' }
-    let(:bad_code) { '12345' }
+    subject(:console) { described_class.new }
+
+    let(:start) { Codebreaker::Console::COMMANDS[:start]}
+    let(:exit) { Codebreaker::Console::COMMANDS[:exit] }
+    let(:statisctics) { Codebreaker::Console::COMMANDS[:stats] }
+    let(:open_rules) { Codebreaker::Console::COMMANDS[:rules] }
+    let(:hint) { Codebreaker::Console::COMMANDS[:hint] }
+    let(:no) { 'n' }
+    let(:yes) { 'y' }
+    let(:level) { Codebreaker::Console::DIFFICULTIES[:hell][:level] }
     let(:code) { '1234' }
-    let(:stats) { 'stats' }
-    let(:rules) { 'rules' }
-    let(:easy) { 'easy' }
-    let(:medium) { 'medium' }
+    let(:name) { 'Di' }
+    let(:rules) { 'Game Rules' }
+    let(:unexpected_command) { 'unexpected command' }
+    let(:path_stats) { Codebreaker::Console::PATH_STATS }
+    let(:game) { instance_double('Game', statistics: 'test') }
 
-    context '#start' do
-      it 'puts welcome and goodbye' do
-        allow(subject).to receive(:gets).and_return('exit')
-        expect { subject.start }.to output(/Welcome! Enter comand 'start', 'rules', 'stats', 'exit'./).to_stdout
-        expect { subject.start }.to output(/Goodbye message!/).to_stdout
-      end
-
-      context '#introduction' do
-        it 'unexpected command' do
-          allow(subject).to receive(:gets) do
-            @counter ||= 0
-            response = if @counter > 1
-                         exit
-                       else
-                         bad_command
-                       end
-            @counter += 1
-            response
-          end
-          expect { subject.start }.to output(/You have passed unexpected command. Please choose one from listed commands./).to_stdout
-        end
-
-        it 'play_game' do
-          allow(subject).to receive(:gets) do
-            @counter ||= 0
-            response = if @counter == 0
-                         start
-                       elsif @counter == 1
-                         level
-                       elsif @counter == 2
-                         name
-                       elsif @counter == 3
-                         hint
-                       elsif @counter == 4
-                         bad_code
-                       elsif @counter > 10
-                         'y'
-                       elsif @counter > 4
-                         code 
-                       end
-            @counter += 1
-            response
-          end
-          expect { subject.start }.to output(/Please enter level easy - 15 attempts. 2 hints medium - 10 attempts. 1 hint hell - 5 attempts. 1 hint./).to_stdout
-          expect { subject.start }.to output(/You should make a guess of 4 numbers from 1 to 6./).to_stdout
-          expect { subject.start }.to output(/Your name./).to_stdout
-          expect { subject.start }.to output(/Codebreaker! Make a guess of 4 numbers from 1 to 6. Enter code or comand 'hint' to hint./).to_stdout
-        end
-      end
-    end
-        
-    it 'stats' do
-      allow(subject).to receive(:gets) do
-        @counter ||= 0
-        response = if @counter > 1
-                     exit
-                   else
-                     stats
-                   end
-        @counter += 1
-        response
-      end
-      expect { subject.start }.to output(/Dima/).to_stdout
-    end
-
-    it 'rules' do
-      allow(subject).to receive(:gets) do
-        @counter ||= 0
-        response = if @counter > 1
-                     exit
-                   else
-                     rules
-                   end
-        @counter += 1
-        response
-      end
-      expect { subject.start }.to output(/Game Rules/).to_stdout
-    end
-
-    it 'difficulty easy' do
-      allow(subject).to receive(:gets).and_return(easy)
-      expect { subject.send(:difficulty) }.to output(/Please enter level easy - 15 attempts. 2 hints medium - 10 attempts. 1 hint hell - 5 attempts. 1 hint/).to_stdout
-    end
-
-    it 'difficulty medium' do
-      allow(subject).to receive(:gets).and_return(medium)
-      expect { subject.send(:difficulty) }.to output(/Please enter level easy - 15 attempts. 2 hints medium - 10 attempts. 1 hint hell - 5 attempts. 1 hint/).to_stdout
-    end
-
-    it 'bad difficulty' do
-      allow(subject).to receive(:gets) do
-        @counter ||= 0
-        response = if @counter > 1
-                     medium
-                   else
-                     bad_command
-                   end
-        @counter += 1
-        response
-      end
-      expect { subject.send(:difficulty) }.to output(/You should enter: easy, medium, hell/).to_stdout
-    end
-
-    context '#name' do
-      it 'ask name' do
-        allow(subject).to receive(:gets).and_return(name)
-        expect { subject.send(:name) }.to output(/Your name./).to_stdout
-      end
-
-      it 'get bad name' do
-        allow(subject).to receive(:gets).and_return('y')
-        expect { csubject.send(:name) }.to raise_error(StandardError)
-      end
-
-      it 'get good name' do
-        allow(subject).to receive(:puts)
-        allow(subject).to receive(:gets).and_return(name)
-        expect(subject.send(:name)).to eq(nil)
+    context'when #start' do
+      it 'puts welcome message' do
+        allow(console).to receive(:gets)
+        allow(console).to receive(:introduction)
+        expect { console.start }.to output(/#{I18n.t(:welcome)}/).to_stdout
       end
     end
 
-    context '#play_again' do
-      before do
-        allow(subject).to receive(:play_game)
-        allow(subject).to receive(:gets).and_return('y')
+    context 'when #play_again' do
+      it 'play_again yes' do
+        allow(console).to receive_message_chain(:gets, :chomp) { yes }
+        allow(console).to receive(:play_game)
+        expect { console.send(:play_again) }.to output("#{I18n.t(:play_again)}\n").to_stdout
+      end
+    end
+
+    context 'when #introduction hint' do
+      it 'hint' do
+        commands = [hint, code, code, code, code, code, no]
+        allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+        allow(console).to receive(:loop).and_yield
+        console.instance_variable_get(:@game).instance_variable_set(:@hints, 1)
+        console.instance_variable_get(:@game).instance_variable_set(:@attempts, 1)
+        expect { console.send(:receive_game_code) }.to output(/#{I18n.t(:enter_code)}/).to_stdout
+      end
+    end
+
+    context 'when #introduction' do
+      it 'exit_message' do
+        allow(console).to receive_message_chain(:gets, :chomp) { exit }
+        expect { console.start }.to output(/#{I18n.t(:goodbye)}/).to_stdout
       end
 
-      it 'ask about play again' do
-        expect { subject.send(:play_again) }.to output(/Would you like to play again?/).to_stdout
+      it 'statisctics' do
+        commands = [statisctics, exit]
+        allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+        expect { console.start }.to output(/#{name}/).to_stdout
       end
 
-      it 'create new game' do
-        allow(subject).to receive(:puts)
-        expect { subject.send(:play_again) }.to change { subject.instance_variable_get(:@game) }
+      it 'statisctics no file' do
+        commands = [statisctics, exit]
+        File.delete(path_stats) if File.file?(path_stats)
+        allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+        expect { console.start }.to output(/#{I18n.t(:no_file)}/).to_stdout
+      end
+
+      it 'open_rules' do
+        commands = [open_rules, exit]
+        allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+        expect { console.start }.to output(/#{rules}/).to_stdout
+      end
+
+      it 'bad command' do
+        commands = [unexpected_command, exit]
+        allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+        expect { console.start }.to output(/#{unexpected_command}/).to_stdout
+      end
+
+      it 'play_game' do
+        commands = [start, level, name, code, code, code, code, code, no]
+        allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+        expect { console.start }.to output(/#{I18n.t(:play_again)}/).to_stdout
+      end
+
+      it 'play_game unexpected_code' do
+        commands = [start, level, name, code, code, code, code, unexpected_command, code, no]
+        allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+        expect { console.start }.to output(/#{I18n.t(:unexpected_code)}/).to_stdout
+      end
+    end
+
+    context 'when #save_statisctics' do
+      it "call #save method" do
+        allow(console).to receive(:puts)
+        console.send(:save_statisctics, name, game)
+      end
+
+      it 'statistics should exist' do
+        allow(console).to receive(:puts)
+        console.send(:save_statisctics, name, game)
+        expect(File.exist?(path_stats)).to eq(true)
       end
     end
   end

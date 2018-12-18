@@ -1,8 +1,7 @@
-require './modules/errors'
 require './modules/validation'
+require './modules/validatable_entity'
 require './modules/console'
 require './modules/game'
-require './modules/storage'
 require 'i18n'
 
 I18n.load_path << Dir[File.expand_path('config/locales') + '/*.yml']

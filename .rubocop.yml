@@ -18,6 +18,9 @@ AllCops:
 Style/RedundantSelf:
   Enabled: false
 
+RSpec/MessageChain:
+  Enabled: false
+
 AllCops:
   Exclude:
     - 'spec/*'

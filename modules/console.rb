@@ -1,16 +1,17 @@
 module Codebreaker
-  class Console
-    include Validation
-
+  class Console < ValidatableEntity
     DIFFICULTIES = { easy: { hints: 2, attempts: 15, level: 'easy' },
-                 medium: { hints: 1, attempts: 10, level: 'medium' },
-                 hell: { hints: 1, attempts: 5, level: 'hell' } }.freeze
-    COMMANDS = { start: 'start', exit: 'exit', stats: 'stats', rusel: 'rules', hint: 'hint' }.freeze
-    REG_EXP_FOR_CODE = /\A[1-6]{4}\Z/
+                     medium: { hints: 1, attempts: 10, level: 'medium' },
+                     hell: { hints: 1, attempts: 5, level: 'hell' } }.freeze
+    COMMANDS = { start: 'start', exit: 'exit', stats: 'stats', rules: 'rules', hint: 'hint' }.freeze
+    REG_EXP_FOR_CODE = /\A[1-6]{4}\Z/.freeze
+    PATH_RULES = './db/rules.txt'.freeze
+    PATH_STATS = './db/statisctics.txt'.freeze
 
-    attr_reader :game
+    attr_reader :game, :errors
 
     def initialize
+      super()
       @game = Game.new
     end
 
@@ -26,15 +27,15 @@ module Codebreaker
         case gets.chomp
         when COMMANDS[:start] then return play_game
         when COMMANDS[:exit] then return exit_message
-        when COMMANDS[:stats] then Storage.statisctics
-        when COMMANDS[:rules] then Storage.open_rules
+        when COMMANDS[:stats] then statisctics
+        when COMMANDS[:rules] then open_rules
         else
           puts I18n.t(:unexpected_command)
         end
       end
     end
 
-    def get_difficulty
+    def receive_difficulty
       puts I18n.t(:level)
       loop do
         input_as_key = gets.chomp.to_sym
@@ -44,16 +45,16 @@ module Codebreaker
     end
 
     def play_game
-      get_difficulty
-      get_name
-      get_game_code
-      Storage.save(@name, @game)
+      receive_difficulty
+      receive_name
+      receive_game_code
+      save_statisctics(@name, @game)
       play_again
     end
 
-    def get_game_code
+    def receive_game_code
       puts I18n.t(:enter_code)
-      while !@game.end_game?
+      until @game.end_game?
         case code = gets.chomp
         when COMMANDS[:hint] then puts @game.hint
         when REG_EXP_FOR_CODE then puts @game.guess(code)
@@ -63,11 +64,11 @@ module Codebreaker
       end
     end
 
-    def get_name
+    def receive_name
       puts I18n.t(:name)
       @name = gets.chomp
-      check_for_class(@name, String)
-      check_for_length(@name)
+      validate
+      puts @errors
     end
 
     def play_again
@@ -79,6 +80,30 @@ module Codebreaker
 
     def exit_message
       puts I18n.t(:goodbye)
+    end
+
+    def statisctics
+      if File.file?(PATH_STATS.to_s)
+        File.open(PATH_STATS.to_s, 'r') { |f| puts f.read }
+      else
+        puts I18n.t(:no_file)
+      end
+    end
+
+    def save_statisctics(name, game)
+      File.open(PATH_STATS.to_s, 'a') do |f|
+        f.puts name, game.statistics, Time.now
+        f.puts '------------------------------'
+      end
+    end
+
+    def open_rules
+      File.open(PATH_RULES.to_s, 'r') { |f| puts f.read } if File.file?(PATH_RULES.to_s)
+    end
+
+    def validate
+      @errors << I18n.t('wrong_class', obj: @name, klass: String) unless check_for_class?(@name, String)
+      @errors << I18n.t('length_error') unless check_for_length?(@name)
     end
   end
 end

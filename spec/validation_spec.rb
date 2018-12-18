@@ -1,18 +1,30 @@
-require './auto_load.rb'
+require 'spec_helper'
 
-  RSpec.describe Validation do
-    let(:name_not_string) { 1111 }
-    let(:name_short_string) { 'Da' }
+RSpec.describe Validation do
+  subject(:console) { Codebreaker::Console.new }
 
-    context '#check_name_for_string' do
-      it 'check_name_for_string' do
-        expect { check_name_for_string(name_not_string) }.to raise_error(StandardError)
-      end
+  let(:valid_length) { 'a' * (Validation::FINISH_LENGTH - 1) }
+  let(:invalid_length) { 'a' * (Validation::FINISH_LENGTH + 1) }
+  let(:valid_klass) { String }
+  let(:invalid_klass) { Integer }
+
+  describe 'valid_check' do
+    context 'when #check_for_length? true' do
+      it { expect(console.check_for_length?(valid_length)).to eq(true) }
     end
 
-    context '#check_name_for_length' do
-      it 'check_name_for_length' do
-        expect { check_name_for_length(name_short_string) }.to raise_error(StandardError)
-      end
+    context 'when #check_for_class? true' do
+      it { expect(console.check_for_class?(valid_length, valid_klass)).to eq(true) }
     end
   end
+
+  describe 'invliad_check' do
+    context 'when #check_for_length? false' do
+      it { expect(console.check_for_length?(invalid_length)).to eq(false) }
+    end
+
+    context 'when #check_for_class? false' do
+      it { expect(console.check_for_class?(valid_length, invalid_klass)).to eq(false) }
+    end
+  end
+end

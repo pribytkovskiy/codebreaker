@@ -3,6 +3,8 @@ SimpleCov.start do
   add_filter '/spec/'
   minimum_coverage 95
 end
+require './auto_load.rb'
+require 'i18n'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
