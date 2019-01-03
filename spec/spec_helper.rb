@@ -5,6 +5,7 @@ SimpleCov.start do
 end
 require './auto_load.rb'
 require 'i18n'
+require 'ffaker'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

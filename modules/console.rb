@@ -3,7 +3,7 @@ module Codebreaker
     DIFFICULTIES = { easy: { hints: 2, attempts: 15, level: 'easy' },
                      medium: { hints: 1, attempts: 10, level: 'medium' },
                      hell: { hints: 1, attempts: 5, level: 'hell' } }.freeze
-    COMMANDS = { start: 'start', exit: 'exit', stats: 'stats', rules: 'rules', hint: 'hint' }.freeze
+    COMMANDS = { start: 'start', exit: 'exit', stats: 'stats', rules: 'rules', hint: 'hint', yes: 'y', no: 'n' }.freeze
     REG_EXP_FOR_CODE = /\A[1-6]{4}\Z/.freeze
     PATH_RULES = './db/rules.txt'.freeze
     PATH_STATS = './db/statisctics.txt'.freeze
@@ -40,7 +40,7 @@ module Codebreaker
       loop do
         input_as_key = gets.chomp.to_sym
         puts I18n.t(:unexpected_level) unless DIFFICULTIES.key?(input_as_key)
-        return @game.difficulty(DIFFICULTIES[input_as_key.to_sym]) if DIFFICULTIES.key?(input_as_key)
+        return @game.difficulty(DIFFICULTIES[input_as_key])
       end
     end
 
@@ -48,7 +48,7 @@ module Codebreaker
       receive_difficulty
       receive_name
       receive_game_code
-      save_statisctics(@name, @game)
+      save_statisctics
       play_again
     end
 
@@ -73,7 +73,8 @@ module Codebreaker
 
     def play_again
       puts I18n.t(:play_again)
-      exit if gets.chomp != 'y'
+      return unless gets.chomp == 'y'
+
       @game = Game.new
       play_game
     end
@@ -83,16 +84,16 @@ module Codebreaker
     end
 
     def statisctics
-      if File.file?(PATH_STATS.to_s)
-        File.open(PATH_STATS.to_s, 'r') { |f| puts f.read }
+      if File.file?(PATH_STATS)
+        File.open(PATH_STATS, 'r') { |f| puts f.read }
       else
         puts I18n.t(:no_file)
       end
     end
 
-    def save_statisctics(name, game)
+    def save_statisctics
       File.open(PATH_STATS.to_s, 'a') do |f|
-        f.puts name, game.statistics, Time.now
+        f.puts @name, @game.statistics, Time.now
         f.puts '------------------------------'
       end
     end

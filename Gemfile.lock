@@ -12,6 +12,7 @@ GEM
     fasterer (0.4.1)
       colorize (~> 0.7)
       ruby_parser (~> 3.11.0)
+    ffaker (2.10.0)
     ffi (1.9.25)
     i18n (1.1.1)
       concurrent-ruby (~> 1.0)
@@ -69,6 +70,7 @@ PLATFORMS
 
 DEPENDENCIES
   fasterer (~> 0.4.1)
+  ffaker
   i18n
   overcommit
   pry

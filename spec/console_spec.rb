@@ -4,22 +4,22 @@ module Codebreaker
   RSpec.describe Codebreaker::Console do
     subject(:console) { described_class.new }
 
-    let(:start) { Codebreaker::Console::COMMANDS[:start]}
+    let(:start) { Codebreaker::Console::COMMANDS[:start] }
     let(:exit) { Codebreaker::Console::COMMANDS[:exit] }
     let(:statisctics) { Codebreaker::Console::COMMANDS[:stats] }
     let(:open_rules) { Codebreaker::Console::COMMANDS[:rules] }
     let(:hint) { Codebreaker::Console::COMMANDS[:hint] }
-    let(:no) { 'n' }
-    let(:yes) { 'y' }
+    let(:no) { Codebreaker::Console::COMMANDS[:no] }
+    let(:yes) { Codebreaker::Console::COMMANDS[:yes] }
     let(:level) { Codebreaker::Console::DIFFICULTIES[:hell][:level] }
-    let(:code) { '1234' }
-    let(:name) { 'Di' }
-    let(:rules) { 'Game Rules' }
+    let(:code) { Codebreaker::Game::SIGNS_FOR_SECRET_CODE.map { FFaker::Random.rand(Codebreaker::Game::RANGE_FOR_SECRET_CODE) }.join }
+    let(:name) { FFaker::Name::FIRST_NAMES }
+    let(:rules) { FFaker::Name::FIRST_NAMES }
     let(:unexpected_command) { 'unexpected command' }
     let(:path_stats) { Codebreaker::Console::PATH_STATS }
-    let(:game) { instance_double('Game', statistics: 'test') }
+    let(:game) { instance_double('Game', statistics: rules) }
 
-    context'when #start' do
+    context 'when #start' do
       it 'puts welcome message' do
         allow(console).to receive(:gets)
         allow(console).to receive(:introduction)
@@ -52,12 +52,6 @@ module Codebreaker
         expect { console.start }.to output(/#{I18n.t(:goodbye)}/).to_stdout
       end
 
-      it 'statisctics' do
-        commands = [statisctics, exit]
-        allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
-        expect { console.start }.to output(/#{name}/).to_stdout
-      end
-
       it 'statisctics no file' do
         commands = [statisctics, exit]
         File.delete(path_stats) if File.file?(path_stats)
@@ -74,13 +68,13 @@ module Codebreaker
       it 'bad command' do
         commands = [unexpected_command, exit]
         allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
-        expect { console.start }.to output(/#{unexpected_command}/).to_stdout
+        expect { console.start }.to output(/#{I18n.t(:unexpected_command)}/).to_stdout
       end
 
       it 'play_game' do
         commands = [start, level, name, code, code, code, code, code, no]
         allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
-        expect { console.start }.to output(/#{I18n.t(:play_again)}/).to_stdout
+        expect { console.start }.to output(/again/).to_stdout
       end
 
       it 'play_game unexpected_code' do
@@ -88,17 +82,37 @@ module Codebreaker
         allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
         expect { console.start }.to output(/#{I18n.t(:unexpected_code)}/).to_stdout
       end
+
+      context 'when #statisctics' do
+        let(:name) { FFaker::Name::FIRST_NAMES }
+
+        before do
+          commands = [start, level, name, code, code, code, code, code, no]
+          allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+        end
+
+        it 'statisctics' do
+          commands = [statisctics, exit]
+          allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
+          expect { console.start }.to output(/#{name}/).to_stdout
+        end
+      end
     end
 
     context 'when #save_statisctics' do
-      it "call #save method" do
+      before do
+        console.instance_variable_set(:@name, name)
+        console.instance_variable_set(:@game, game)
+      end
+
+      it 'call #save method' do
         allow(console).to receive(:puts)
-        console.send(:save_statisctics, name, game)
+        console.send(:save_statisctics)
       end
 
       it 'statistics should exist' do
         allow(console).to receive(:puts)
-        console.send(:save_statisctics, name, game)
+        console.send(:save_statisctics)
         expect(File.exist?(path_stats)).to eq(true)
       end
     end

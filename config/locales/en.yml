@@ -7,7 +7,7 @@ en:
   enter_code: "Codebreaker! Make a guess of 4 numbers from 1 to 6. Enter code or comand 'hint' to hint."
   unexpected_code: 'You should make a guess of 4 numbers from 1 to 6.'
   name: 'Your name.'
-  play_again: 'Would you like to play again? (y/n)'
+  play_again: Would you like to play again? (yn)
   no_file: 'No statistics file'
   start_command: 'start'
   exit_command: 'exit'

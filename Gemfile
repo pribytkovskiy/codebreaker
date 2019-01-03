@@ -14,6 +14,7 @@ group :test do
   gem 'simplecov', require: false
   gem 'rspec'
   gem 'rubocop-rspec'
+  gem 'ffaker'
 end
 
 group :development, :test do
