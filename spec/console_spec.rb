@@ -14,10 +14,10 @@ module Codebreaker
     let(:level) { Codebreaker::Console::DIFFICULTIES[:hell][:level] }
     let(:code) { Codebreaker::Game::SIGNS_FOR_SECRET_CODE.map { FFaker::Random.rand(Codebreaker::Game::RANGE_FOR_SECRET_CODE) }.join }
     let(:name) { FFaker::Name::FIRST_NAMES }
-    let(:rules) { FFaker::Name::FIRST_NAMES }
+    let(:rules) { 'Game Rules' }
     let(:unexpected_command) { 'unexpected command' }
     let(:path_stats) { Codebreaker::Console::PATH_STATS }
-    let(:game) { instance_double('Game', statistics: rules) }
+    let(:game) { instance_double('Game', statistics: FFaker::Lorem.phrase) }
 
     context 'when #start' do
       it 'puts welcome message' do
