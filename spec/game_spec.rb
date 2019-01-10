@@ -5,25 +5,22 @@ module Codebreaker
     subject(:game) { described_class.new }
 
     let(:difficult) { { level: 'hell', attempts: 5, hints: 1 } }
+    let(:level) { 'hell' }
     let(:message) { 'message' }
-    let(:hints) { 2 }
+    let(:hints) { 1 }
     let(:code) { [1, 2, 3, 4] }
     let(:code_string) { '1234' }
-    let(:attempts) { 5 }
+    let(:attempts) { 5 } 
 
     context 'when #difficulty' do
-      before { game.difficulty(difficult) }
+      before { game.difficulty(level) }
 
       it 'check_total_attempts_params' do
-        expect(game.instance_variable_get(:@total_attempts)).to eq(5)
+        expect(game.instance_variable_get(:@difficult)).to eq(difficult)
       end
 
       it 'check_attempts_params' do
         expect(game.instance_variable_get(:@attempts)).to eq(5)
-      end
-
-      it 'check_total_hints_params' do
-        expect(game.instance_variable_get(:@total_hints)).to eq(1)
       end
 
       it 'check_hints_params' do
@@ -31,34 +28,25 @@ module Codebreaker
       end
     end
 
-    context 'when #end_game?' do
-      it 'return true if @end_game eq true' do
-        game.instance_variable_set(:@end_game, true)
-        expect(game.end_game?).to eq(true)
-      end
-    end
-
     context 'when #choice statistics' do
       it 'statistics string include status difficulty code' do
-        game.instance_variable_set(:@total_attempts, attempts)
+        game.instance_variable_set(:@difficult, difficult)
         game.instance_variable_set(:@attempts, attempts)
-        game.instance_variable_set(:@total_hints, hints)
         game.instance_variable_set(:@hints, hints)
         game.instance_variable_set(:@status, 'Win')
-        game.instance_variable_set(:@level, 'hell')
         game.instance_variable_set(:@secret_code, code_string)
         expect(game.statistics).to include('Win', 'hell', code_string)
       end
 
       it 'return statistics is a String' do
-        game.difficulty(difficult)
+        game.difficulty(level)
         expect(game.statistics).to be_is_a(String)
       end
     end
 
     context 'when #guess' do
       before do
-        game.difficulty(difficult)
+        game.difficulty(level)
       end
 
       it 'reduce attempts number by 1' do
@@ -126,7 +114,7 @@ module Codebreaker
 
       it "You don't have any hints." do
         game.instance_variable_set(:@hints, 0)
-        expect(game.hint).to eq(I18n.t(:no_hint))
+        expect(game.hint).to eq(nil)
       end
 
       it 'return one number of secret code' do

@@ -22,3 +22,6 @@ en:
   no_attempts: 'Game over! You have no more attempts'
   wrong_class: "Wrong class! #{obj} class not #{klass}"
   length_error: 'Length between 3 - 20 chars'
+  statistics: 
+    "Status: %{status}, level: %{level}, secret code: %{secret_code}, attempts total: %{total_attempts},
+    attempts used: %{attempts_used}, hints total: %{total_hints}, hints used: %{hints_used}"

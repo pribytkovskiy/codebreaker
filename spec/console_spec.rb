@@ -11,11 +11,11 @@ module Codebreaker
     let(:hint) { Codebreaker::Console::COMMANDS[:hint] }
     let(:no) { Codebreaker::Console::COMMANDS[:no] }
     let(:yes) { Codebreaker::Console::COMMANDS[:yes] }
-    let(:level) { Codebreaker::Console::DIFFICULTIES[:hell][:level] }
+    let(:level) { Codebreaker::Game::DIFFICULTIES[:hell][:level] }
     let(:code) { Codebreaker::Game::SIGNS_FOR_SECRET_CODE.map { FFaker::Random.rand(Codebreaker::Game::RANGE_FOR_SECRET_CODE) }.join }
     let(:name) { FFaker::Name::FIRST_NAMES }
     let(:rules) { 'Game Rules' }
-    let(:unexpected_command) { 'unexpected command' }
+    let(:unexpected_command) { 'startttt' }
     let(:path_stats) { Codebreaker::Console::PATH_STATS }
     let(:game) { instance_double('Game', statistics: FFaker::Lorem.phrase) }
 
@@ -107,12 +107,12 @@ module Codebreaker
 
       it 'call #save method' do
         allow(console).to receive(:puts)
-        console.send(:save_statisctics)
+        console.send(:save_statistics)
       end
 
       it 'statistics should exist' do
         allow(console).to receive(:puts)
-        console.send(:save_statisctics)
+        console.send(:save_statistics)
         expect(File.exist?(path_stats)).to eq(true)
       end
     end

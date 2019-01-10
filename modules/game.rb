@@ -1,28 +1,42 @@
 module Codebreaker
   class Game
-    attr_reader :secret_code, :end_game
+    attr_reader :secret_code, :end_game, :hints
 
     RANGE_FOR_SECRET_CODE = (1..6).freeze
     SIGNS_FOR_SECRET_CODE = (1..4).freeze
+
+    DIFFICULTIES = {
+      easy: { hints: 2, attempts: 15, level: 'easy' },
+      medium: { hints: 1, attempts: 10, level: 'medium' },
+      hell: { hints: 1, attempts: 5, level: 'hell' }
+    }.freeze
 
     def initialize
       @secret_code = random
       @end_game = false
     end
 
-    def difficulty(difficulty)
-      @total_attempts = @attempts = difficulty[:attempts]
-      @total_hints = @hints = difficulty[:hints]
-      @level = difficulty[:level]
-    end
-
-    def end_game?
-      @end_game
+    def difficulty(level)
+      @difficult = DIFFICULTIES[level.to_sym]
+      @attempts = @difficult[:attempts]
+      @hints = @difficult[:hints]
     end
 
     def statistics
-      "Status: #{@status}, level: #{@level}, secret code: #{@secret_code}, attempts total: #{@total_attempts},
-      attempts used: #{@total_attempts - @attempts}, hints total:#{@total_hints}, hints used: #{@total_hints - @hints}"
+      I18n.t(
+        :statistics, status: @status, level: @difficult[:level],
+        secret_code: @secret_code, total_attempts: @difficult[:attempts],
+        attempts_used: attempts_used, total_hints: @difficult[:hints],
+        hints_used: hints_used
+      )
+    end
+
+    def attempts_used
+      @difficult[:attempts] - @attempts
+    end
+
+    def hints_used
+      @difficult[:hints] - hints
     end
 
     def guess(code)
@@ -34,10 +48,10 @@ module Codebreaker
     end
 
     def hint
-      return I18n.t(:no_hint) if @hints.zero?
+      return if hints.zero?
 
       @hints -= 1
-      @hint_array ||= @secret_code.shuffle
+      @hint_array ||= secret_code.shuffle
       @hint_array.pop
     end
 
@@ -87,7 +101,7 @@ module Codebreaker
         @array_secret_code[index] = nil
         @answer << '-'
       end
-      @answer.join if @end_game == false
+      @answer.join if end_game == false
     end
   end
 end

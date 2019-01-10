@@ -1,14 +1,10 @@
 module Codebreaker
   class Console < ValidatableEntity
-    DIFFICULTIES = {
-      easy: { hints: 2, attempts: 15, level: 'easy' },
-      medium: { hints: 1, attempts: 10, level: 'medium' },
-      hell: { hints: 1, attempts: 5, level: 'hell' }
-    }.freeze
+
     COMMANDS = { start: 'start', exit: 'exit', stats: 'stats', rules: 'rules', hint: 'hint', yes: 'y', no: 'n' }.freeze
     REG_EXP_FOR_CODE = /\A[1-6]{4}\Z/.freeze
     PATH_RULES = './db/rules.txt'.freeze
-    PATH_STATS = './db/statisctics.txt'.freeze
+    PATH_STATS = './db/statistics.txt'.freeze
 
     attr_reader :name, :game, :errors
 
@@ -29,7 +25,7 @@ module Codebreaker
         case gets.chomp
         when COMMANDS[:start] then return play_game
         when COMMANDS[:exit] then return exit_message
-        when COMMANDS[:stats] then statisctics
+        when COMMANDS[:stats] then statistics
         when COMMANDS[:rules] then open_rules
         else
           puts I18n.t(:unexpected_command)
@@ -41,8 +37,11 @@ module Codebreaker
       puts I18n.t(:level)
       loop do
         input_as_key = gets.chomp.to_sym
-        puts I18n.t(:unexpected_level) unless DIFFICULTIES.key?(input_as_key)
-        return game.difficulty(DIFFICULTIES[input_as_key])
+        if Codebreaker::Game::DIFFICULTIES.key?(input_as_key)
+          return game.difficulty(Codebreaker::Game::DIFFICULTIES[input_as_key][:level])
+        end
+
+        puts I18n.t(:unexpected_level)
       end
     end
 
@@ -50,13 +49,13 @@ module Codebreaker
       receive_difficulty
       receive_name
       receive_game_code
-      save_statisctics
+      save_statistics
       play_again
     end
 
     def receive_game_code # rubocop:disable Metrics/AbcSize
       puts I18n.t(:enter_code)
-      until game.end_game?
+      until game.end_game
         case code = gets.chomp
         when COMMANDS[:hint] then puts game.hint
         when REG_EXP_FOR_CODE then puts game.guess(code)
@@ -64,6 +63,12 @@ module Codebreaker
           puts I18n.t(:unexpected_code)
         end
       end
+    end
+
+    def hint
+      return game.hint unless game.hints.zero?
+
+      puts I18n.t(:no_hint)
     end
 
     def receive_name
@@ -75,7 +80,7 @@ module Codebreaker
 
     def play_again
       puts I18n.t(:play_again)
-      return unless gets.chomp == 'y'
+      return unless gets.chomp == COMMANDS[:yes]
 
       @game = Game.new
       play_game
@@ -85,7 +90,7 @@ module Codebreaker
       puts I18n.t(:goodbye)
     end
 
-    def statisctics
+    def statistics
       if File.file?(PATH_STATS)
         File.open(PATH_STATS, 'r') { |f| puts f.read }
       else
@@ -93,7 +98,7 @@ module Codebreaker
       end
     end
 
-    def save_statisctics
+    def save_statistics
       File.open(PATH_STATS.to_s, 'a') do |f|
         f.puts name, game.statistics, Time.now
         f.puts '------------------------------'
