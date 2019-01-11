@@ -3,14 +3,16 @@ require 'spec_helper'
 RSpec.describe Codebreaker::Validation do
   subject(:current_subject) { Codebreaker::Validation }
 
-  let(:valid_length) { 'a' * (Codebreaker::Validation::FINISH_LENGTH - 1) }
-  let(:invalid_length) { 'a' * (Codebreaker::Validation::FINISH_LENGTH + 1) }
+  let(:valid_length) { 'a' * (Codebreaker::Console::NAME_FINISH_LENGTH - 1) }
+  let(:invalid_length) { 'a' * (Codebreaker::Console::NAME_FINISH_LENGTH + 1) }
   let(:valid_klass) { String }
   let(:invalid_klass) { Integer }
 
   describe 'valid_check' do
     context 'when #check_for_length? true' do
-      it { expect(current_subject.check_for_length?(valid_length)).to eq(true) }
+      it { expect(current_subject.check_for_length?(
+             valid_length, Codebreaker::Console::NAME_START_LENGTH, Codebreaker::Console::NAME_FINISH_LENGTH)
+           ).to eq(true) }
     end
 
     context 'when #check_for_class? true' do
@@ -20,7 +22,9 @@ RSpec.describe Codebreaker::Validation do
 
   describe 'invliad_check' do
     context 'when #check_for_length? false' do
-      it { expect(current_subject.check_for_length?(invalid_length)).to eq(false) }
+      it { expect(current_subject.check_for_length?(
+             invalid_length, Codebreaker::Console::NAME_START_LENGTH, Codebreaker::Console::NAME_FINISH_LENGTH)
+           ).to eq(false) }
     end
 
     context 'when #check_for_class? false' do

@@ -1,7 +1,11 @@
 module Codebreaker
   class Console
+    attr_reader :name, :game
+
     COMMANDS = { start: 'start', exit: 'exit', stats: 'stats', rules: 'rules', hint: 'hint', yes: 'y', no: 'n' }.freeze
     REG_EXP_FOR_CODE = /\A[1-6]{4}\Z/.freeze
+    NAME_START_LENGTH = 3
+    NAME_FINISH_LENGTH = 20
 
     def initialize
       super()
@@ -41,7 +45,7 @@ module Codebreaker
       loop do
         input_as_key = gets.chomp.to_sym
         if Codebreaker::Game::DIFFICULTIES.key?(input_as_key)
-          return @game.difficulty(Codebreaker::Game::DIFFICULTIES[input_as_key][:level])
+          return game.difficulty(Codebreaker::Game::DIFFICULTIES[input_as_key][:level])
         end
 
         puts I18n.t(:unexpected_level)
@@ -51,26 +55,30 @@ module Codebreaker
     def receive_name
       puts I18n.t(:name)
       @name = gets.chomp
-      p I18n.t(:wrong_class, obj: @name, klass: String) unless Codebreaker::Validation.check_for_class?(@name, String)
-      puts I18n.t(:length_error) unless Codebreaker::Validation.check_for_length?(@name)
+      unless Codebreaker::Validation.check_for_class?(name, String)
+        puts I18n.t(:wrong_class, obj: name, klass: String)
+      end
+      unless Codebreaker::Validation.check_for_length?(name, NAME_START_LENGTH, NAME_FINISH_LENGTH)
+        puts I18n.t(:length_error)
+      end
     end
 
     def check_game_status
       puts I18n.t(:enter_code)
-      recive_code_or_hint until @game.game_status != Codebreaker::Game::STATUS[:game]
+      recive_code_or_hint until game.game_status != Codebreaker::Game::STATUS[:game]
     end
 
     def recive_code_or_hint
       case code = gets.chomp
       when COMMANDS[:hint] then puts recive_hint
-      when REG_EXP_FOR_CODE then puts @game.game_process(code)
+      when REG_EXP_FOR_CODE then puts game.game_process(code)
       else
         puts I18n.t(:unexpected_code)
       end
     end
 
     def recive_hint
-      return @game.receive_hint unless @game.hints.zero?
+      return game.receive_hint unless game.hints.zero?
 
       puts I18n.t(:no_hint)
     end
@@ -94,7 +102,7 @@ module Codebreaker
     end
 
     def save_statistics
-      Codebreaker::Storage.save_statistics(@name, @game)
+      Codebreaker::Storage.save_statistics(name, game)
     end
 
     def open_rules

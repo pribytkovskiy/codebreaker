@@ -29,7 +29,7 @@ module Codebreaker
 
       def statistics(game)
         I18n.t(
-          :statistics, status: game.game_status, level: game.difficult[:level],
+          :statistics, status: game_status(game), level: game.difficult[:level],
           secret_code: game.secret_code, total_attempts: game.difficult[:attempts],
           attempts_used: attempts_used(game), total_hints: game.difficult[:hints],
           hints_used: hints_used(game)
@@ -42,6 +42,13 @@ module Codebreaker
 
       def hints_used(game)
         game.difficult[:hints] - game.hints
+      end
+
+      def game_status(game)
+        case game.game_status
+        when :win then I18n.t(:win)
+        when :no_attempts then I18n.t(:no_attempts)
+        end
       end
     end
   end

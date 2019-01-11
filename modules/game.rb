@@ -1,6 +1,6 @@
 module Codebreaker
   class Game
-    attr_reader :secret_code, :game_status, :hints, :attempts, :difficult
+    attr_reader :secret_code, :game_status, :hints, :attempts, :difficult, :array_input_code, :hint_array
 
     STATUS = { win: :win, no_attempts: :no_attempts, game: :game }.freeze
     RANGE_FOR_SECRET_CODE = (1..6).freeze
@@ -35,7 +35,7 @@ module Codebreaker
 
       @hints -= 1
       @hint_array ||= secret_code.shuffle
-      @hint_array.pop
+      hint_array.pop
     end
 
     private
@@ -45,12 +45,12 @@ module Codebreaker
     end
 
     def check_game_status
-      return @game_status = STATUS[:win] if @array_input_code == secret_code
+      return @game_status = STATUS[:win] if array_input_code == secret_code
       return @game_status = STATUS[:no_attempts] if attempts.zero?
     end
 
     def mark
-      Codebreaker::Mark.mark_plus(@array_input_code, secret_code)
+      Codebreaker::Mark.mark_plus(array_input_code, secret_code)
     end
   end
 end
