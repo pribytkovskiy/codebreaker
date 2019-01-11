@@ -13,11 +13,15 @@ module Codebreaker
     let(:yes) { Codebreaker::Console::COMMANDS[:yes] }
     let(:level) { Codebreaker::Game::DIFFICULTIES[:hell][:level] }
     let(:code) { Codebreaker::Game::SIGNS_FOR_SECRET_CODE.map { FFaker::Random.rand(Codebreaker::Game::RANGE_FOR_SECRET_CODE) }.join }
-    let(:name) { FFaker::Name::FIRST_NAMES }
+    let(:name) { FFaker::Name::FIRST_NAMES.first }
     let(:rules) { 'Game Rules' }
-    let(:unexpected_command) { 'startttt' }
-    let(:path_stats) { Codebreaker::Console::PATH_STATS }
-    let(:game) { instance_double('Game', statistics: FFaker::Lorem.phrase) }
+    let(:unexpected_command) { FFaker::Lorem.phrase }
+    let(:path_stats) { Codebreaker::Storage::PATH_STATS }
+    let(:difficult) { Codebreaker::Game::DIFFICULTIES[:hell] }
+    let(:status) { Codebreaker::Game::STATUS[:win] }
+    let(:attempts) { FFaker::Random.rand(5..15) }
+    let(:hints) { FFaker::Random.rand(1..2) }
+    let(:game) { instance_double('Game', game_status: status, difficult: difficult, secret_code: code, attempts: attempts, hints: hints) }
 
     context 'when #start' do
       it 'puts welcome message' do
@@ -30,7 +34,7 @@ module Codebreaker
     context 'when #play_again' do
       it 'play_again yes' do
         allow(console).to receive_message_chain(:gets, :chomp) { yes }
-        allow(console).to receive(:play_game)
+        allow(console).to receive(:start_game)
         expect { console.send(:play_again) }.to output("#{I18n.t(:play_again)}\n").to_stdout
       end
     end
@@ -42,7 +46,7 @@ module Codebreaker
         allow(console).to receive(:loop).and_yield
         console.instance_variable_get(:@game).instance_variable_set(:@hints, 1)
         console.instance_variable_get(:@game).instance_variable_set(:@attempts, 1)
-        expect { console.send(:receive_game_code) }.to output(/#{I18n.t(:enter_code)}/).to_stdout
+        expect { console.send(:check_game_status) }.to output(/#{I18n.t(:enter_code)}/).to_stdout
       end
     end
 
@@ -71,21 +75,19 @@ module Codebreaker
         expect { console.start }.to output(/#{I18n.t(:unexpected_command)}/).to_stdout
       end
 
-      it 'play_game' do
+      it 'start_game' do
         commands = [start, level, name, code, code, code, code, code, no]
         allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
         expect { console.start }.to output(/again/).to_stdout
       end
 
-      it 'play_game unexpected_code' do
+      it 'start_game unexpected_code' do
         commands = [start, level, name, code, code, code, code, unexpected_command, code, no]
         allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
         expect { console.start }.to output(/#{I18n.t(:unexpected_code)}/).to_stdout
       end
 
       context 'when #statisctics' do
-        let(:name) { FFaker::Name::FIRST_NAMES }
-
         before do
           commands = [start, level, name, code, code, code, code, code, no]
           allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
@@ -99,7 +101,7 @@ module Codebreaker
       end
     end
 
-    context 'when #save_statisctics' do
+    context 'when #save_statistics' do
       before do
         console.instance_variable_set(:@name, name)
         console.instance_variable_set(:@game, game)

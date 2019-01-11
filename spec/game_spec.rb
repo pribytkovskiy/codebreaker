@@ -4,16 +4,10 @@ module Codebreaker
   RSpec.describe Codebreaker::Game do
     subject(:game) { described_class.new }
 
-    let(:difficult) { { level: 'hell', attempts: 5, hints: 1 } }
-    let(:level) { 'hell' }
-    let(:message) { 'message' }
-    let(:hints) { 1 }
-    let(:code) { [1, 2, 3, 4] }
-    let(:code_string) { '1234' }
-    let(:attempts) { 5 } 
+    let(:difficult) { Codebreaker::Game::DIFFICULTIES[:hell] }
 
     context 'when #difficulty' do
-      before { game.difficulty(level) }
+      before { game.difficulty(difficult[:level]) }
 
       it 'check_total_attempts_params' do
         expect(game.instance_variable_get(:@difficult)).to eq(difficult)
@@ -28,49 +22,37 @@ module Codebreaker
       end
     end
 
-    context 'when #choice statistics' do
-      it 'statistics string include status difficulty code' do
-        game.instance_variable_set(:@difficult, difficult)
-        game.instance_variable_set(:@attempts, attempts)
-        game.instance_variable_set(:@hints, hints)
-        game.instance_variable_set(:@status, 'Win')
-        game.instance_variable_set(:@secret_code, code_string)
-        expect(game.statistics).to include('Win', 'hell', code_string)
-      end
+    context 'when #game_process' do
+      let(:code) { Codebreaker::Game::SIGNS_FOR_SECRET_CODE.map { FFaker::Random.rand(Codebreaker::Game::RANGE_FOR_SECRET_CODE) } }
+      let(:code_string) { code.join }
 
-      it 'return statistics is a String' do
-        game.difficulty(level)
-        expect(game.statistics).to be_is_a(String)
-      end
-    end
-
-    context 'when #guess' do
       before do
-        game.difficulty(level)
+        game.difficulty(difficult[:level])
       end
 
       it 'reduce attempts number by 1' do
-        expect { game.guess(code_string) }.to change { game.instance_variable_get(:@attempts) }.by(-1)
+        expect { game.game_process(code_string) }.to change { game.instance_variable_get(:@attempts) }.by(-1)
       end
 
       it '@code Array' do
-        game.guess(code_string)
-        expect(game.instance_variable_get(:@code)).to eq(code)
+        game.game_process(code_string)
+        expect(game.instance_variable_get(:@array_input_code)).to eq(code)
       end
 
-      context 'when #check_win' do
-        it 'when win @end_game eq true' do
+      context 'when #check_game_status win' do
+        let(:game_status_win) { Codebreaker::Game::STATUS[:win] }
+        let(:game_status_no_attempts) { Codebreaker::Game::STATUS[:no_attempts] }
+
+        it 'when win @game_status eq win' do
           game.instance_variable_set(:@secret_code, code)
-          game.guess(code_string)
-          expect(game.instance_variable_get(:@end_game)).to eq(true)
+          game.game_process(code_string)
+          expect(game.instance_variable_get(:@game_status)).to eq(game_status_win)
         end
-      end
 
-      context 'when #check_attempts' do
-        it 'when game over @end_game eq true' do
+        it 'when game over @game_statueeq no_attempts' do
           game.instance_variable_set(:@attempts, 1)
-          game.guess(code_string)
-          expect(game.instance_variable_get(:@end_game)).to eq(true)
+          game.game_process(code_string)
+          expect(game.instance_variable_get(:@game_status)).to eq(game_status_no_attempts)
         end
       end
 
@@ -99,39 +81,29 @@ module Codebreaker
          [[1, 4, 1, 5],  '4115', '++--'], [[2, 3, 1, 5], '4115', '++']].each do |item|
           it "Secret code is #{item[0]}, guess #{item[1]}, return #{item[2]}" do
             game.instance_variable_set(:@secret_code, item[0])
-            game.instance_variable_set(:@end_game, false)
-            expect(game.guess(item[1])).to eq(item[2])
+            game.instance_variable_set(:@game_status, :game)
+            expect(game.game_process(item[1])).to eq(item[2])
           end
         end
       end
     end
 
     context 'when #hint' do
+      let(:hints) { FFaker::Random.rand(1..2) }
+
       it 'reduce hint number by 1' do
         game.instance_variable_set(:@hints, hints)
-        expect { game.hint }.to change { game.instance_variable_get(:@hints) }.by(-1)
+        expect { game.receive_hint }.to change { game.instance_variable_get(:@hints) }.by(-1)
       end
 
       it "You don't have any hints." do
         game.instance_variable_set(:@hints, 0)
-        expect(game.hint).to eq(nil)
+        expect(game.receive_hint).to eq(nil)
       end
 
       it 'return one number of secret code' do
         game.instance_variable_set(:@hints, hints)
-        expect(game.instance_variable_get(:@secret_code)).to include(game.hint)
-      end
-    end
-
-    context 'when #exit_with_status' do
-      before { game.send(:exit_with_status, message) }
-
-      it '@exit eq true.' do
-        expect(game.instance_variable_get(:@end_game)).to eq(true)
-      end
-
-      it '@status eq message.' do
-        expect(game.instance_variable_get(:@status)).to eq(message)
+        expect(game.instance_variable_get(:@secret_code)).to include(game.receive_hint)
       end
     end
   end

@@ -1,0 +1,16 @@
+Aaron
+Status: no_attempts, level: hell, secret code: [2, 1, 2, 3], attempts total: 5, attempts used: 5, hints total: 1, hints used: 0
+2019-01-11 15:07:12 +0200
+------------------------------
+Aaron
+Status: no_attempts, level: hell, secret code: [2, 3, 3, 6], attempts total: 5, attempts used: 5, hints total: 1, hints used: 0
+2019-01-11 15:07:12 +0200
+------------------------------
+Aaron
+Status: win, level: hell, secret code: 3142, attempts total: 5, attempts used: -8, hints total: 1, hints used: -1
+2019-01-11 15:07:12 +0200
+------------------------------
+Aaron
+Status: win, level: hell, secret code: 4223, attempts total: 5, attempts used: -8, hints total: 1, hints used: 0
+2019-01-11 15:07:12 +0200
+------------------------------

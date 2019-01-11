@@ -1,6 +1,7 @@
 require './modules/validation'
-require './modules/validatable_entity'
+require './modules/storage'
 require './modules/console'
+require './modules/mark'
 require './modules/game'
 require 'i18n'
 

@@ -1,7 +1,8 @@
 module Codebreaker
   class Game
-    attr_reader :secret_code, :end_game, :hints
+    attr_reader :secret_code, :game_status, :hints, :attempts, :difficult
 
+    STATUS = { win: :win, no_attempts: :no_attempts, game: :game }.freeze
     RANGE_FOR_SECRET_CODE = (1..6).freeze
     SIGNS_FOR_SECRET_CODE = (1..4).freeze
 
@@ -13,41 +14,23 @@ module Codebreaker
 
     def initialize
       @secret_code = random
-      @end_game = false
+      @game_status = STATUS[:game]
     end
 
     def difficulty(level)
       @difficult = DIFFICULTIES[level.to_sym]
-      @attempts = @difficult[:attempts]
-      @hints = @difficult[:hints]
+      @attempts = difficult[:attempts]
+      @hints = difficult[:hints]
     end
 
-    def statistics
-      I18n.t(
-        :statistics, status: @status, level: @difficult[:level],
-        secret_code: @secret_code, total_attempts: @difficult[:attempts],
-        attempts_used: attempts_used, total_hints: @difficult[:hints],
-        hints_used: hints_used
-      )
-    end
-
-    def attempts_used
-      @difficult[:attempts] - @attempts
-    end
-
-    def hints_used
-      @difficult[:hints] - hints
-    end
-
-    def guess(code)
-      @code = code.split('').map(&:to_i)
+    def game_process(input)
+      @array_input_code = input.split('').map(&:to_i)
       @attempts -= 1
-      check_win
-      check_attempts
+      check_game_status
       mark
     end
 
-    def hint
+    def receive_hint
       return if hints.zero?
 
       @hints -= 1
@@ -61,17 +44,9 @@ module Codebreaker
       SIGNS_FOR_SECRET_CODE.map { rand(RANGE_FOR_SECRET_CODE) }
     end
 
-    def exit_with_status(message)
-      @end_game = true
-      @status = message
-    end
-
-    def check_win
-      return exit_with_status(I18n.t(:win)) if @code == @secret_code
-    end
-
-    def check_attempts
-      return exit_with_status(I18n.t(:no_attempts)) if @attempts.zero?
+    def check_game_status
+      return @game_status = STATUS[:win] if @array_input_code == secret_code
+      return @game_status = STATUS[:no_attempts] if attempts.zero?
     end
 
     def mark
@@ -80,8 +55,8 @@ module Codebreaker
     end
 
     def mark_plus
-      @array_code = Array.new(@code)
-      @array_secret_code = Array.new(@secret_code)
+      @array_code = Array.new(@array_input_code)
+      @array_secret_code = Array.new(secret_code)
       @answer = []
       @array_code.zip(@array_secret_code).each_with_index do |(code, secret_code), i|
         next if code != secret_code
@@ -101,7 +76,7 @@ module Codebreaker
         @array_secret_code[index] = nil
         @answer << '-'
       end
-      @answer.join if end_game == false
+      @answer.join if game_status == STATUS[:game]
     end
   end
 end
