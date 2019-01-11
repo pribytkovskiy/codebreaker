@@ -20,7 +20,7 @@ module Codebreaker
         case gets.chomp
         when COMMANDS[:start] then return start_game
         when COMMANDS[:exit] then return exit_message
-        when COMMANDS[:stats] then statistics
+        when COMMANDS[:stats] then open_statistics
         when COMMANDS[:rules] then open_rules
         else
           puts I18n.t(:unexpected_command)
@@ -87,7 +87,7 @@ module Codebreaker
       puts I18n.t(:goodbye)
     end
 
-    def statistics
+    def open_statistics
       return puts I18n.t(:no_file) if Codebreaker::Storage.open_statistics == Codebreaker::Storage::STATUS[:no_file]
 
       puts Codebreaker::Storage.open_statistics

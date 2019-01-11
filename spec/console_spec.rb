@@ -4,24 +4,18 @@ module Codebreaker
   RSpec.describe Codebreaker::Console do
     subject(:console) { described_class.new }
 
-    let(:start) { Codebreaker::Console::COMMANDS[:start] }
-    let(:exit) { Codebreaker::Console::COMMANDS[:exit] }
-    let(:statisctics) { Codebreaker::Console::COMMANDS[:stats] }
-    let(:open_rules) { Codebreaker::Console::COMMANDS[:rules] }
-    let(:hint) { Codebreaker::Console::COMMANDS[:hint] }
+    FAKE_PATH_STATS = 'spec/fixtures/statistics.txt'.freeze
+
     let(:no) { Codebreaker::Console::COMMANDS[:no] }
-    let(:yes) { Codebreaker::Console::COMMANDS[:yes] }
-    let(:level) { Codebreaker::Game::DIFFICULTIES[:hell][:level] }
     let(:code) { Codebreaker::Game::SIGNS_FOR_SECRET_CODE.map { FFaker::Random.rand(Codebreaker::Game::RANGE_FOR_SECRET_CODE) }.join }
     let(:name) { FFaker::Name::FIRST_NAMES.first }
-    let(:rules) { 'Game Rules' }
-    let(:unexpected_command) { FFaker::Lorem.phrase }
     let(:path_stats) { Codebreaker::Storage::PATH_STATS }
     let(:difficult) { Codebreaker::Game::DIFFICULTIES[:hell] }
     let(:status) { Codebreaker::Game::STATUS[:win] }
     let(:attempts) { FFaker::Random.rand(5..15) }
     let(:hints) { FFaker::Random.rand(1..2) }
     let(:game) { instance_double('Game', game_status: status, difficult: difficult, secret_code: code, attempts: attempts, hints: hints) }
+
 
     context 'when #start' do
       it 'puts welcome message' do
@@ -32,6 +26,8 @@ module Codebreaker
     end
 
     context 'when #play_again' do
+      let(:yes) { Codebreaker::Console::COMMANDS[:yes] }
+
       it 'play_again yes' do
         allow(console).to receive_message_chain(:gets, :chomp) { yes }
         allow(console).to receive(:start_game)
@@ -40,6 +36,8 @@ module Codebreaker
     end
 
     context 'when #introduction hint' do
+      let(:hint) { Codebreaker::Console::COMMANDS[:hint] }
+
       it 'hint' do
         commands = [hint, code, code, code, code, code, no]
         allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
@@ -51,6 +49,13 @@ module Codebreaker
     end
 
     context 'when #introduction' do
+      let(:start) { Codebreaker::Console::COMMANDS[:start] }
+      let(:exit) { Codebreaker::Console::COMMANDS[:exit] }
+      let(:statisctics) { Codebreaker::Console::COMMANDS[:stats] }
+      let(:open_rules) { Codebreaker::Console::COMMANDS[:rules] }
+      let(:level) { Codebreaker::Game::DIFFICULTIES[:hell][:level] }
+      let(:unexpected_command) { FFaker::Lorem.phrase }
+
       it 'exit_message' do
         allow(console).to receive_message_chain(:gets, :chomp) { exit }
         expect { console.start }.to output(/#{I18n.t(:goodbye)}/).to_stdout
@@ -58,7 +63,8 @@ module Codebreaker
 
       it 'statisctics no file' do
         commands = [statisctics, exit]
-        File.delete(path_stats) if File.file?(path_stats)
+        File.delete(FAKE_PATH_STATS) if File.file?(FAKE_PATH_STATS)
+        stub_const('Codebreaker::Storage::PATH_STATS', FAKE_PATH_STATS)
         allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
         expect { console.start }.to output(/#{I18n.t(:no_file)}/).to_stdout
       end
@@ -66,7 +72,7 @@ module Codebreaker
       it 'open_rules' do
         commands = [open_rules, exit]
         allow(console).to receive_message_chain(:gets, :chomp).and_return(*commands)
-        expect { console.start }.to output(/#{rules}/).to_stdout
+        expect { console.start }.to output(/rules/).to_stdout
       end
 
       it 'bad command' do
@@ -105,6 +111,11 @@ module Codebreaker
       before do
         console.instance_variable_set(:@name, name)
         console.instance_variable_set(:@game, game)
+        stub_const('Codebreaker::Storage::PATH_STATS', FAKE_PATH_STATS)
+      end
+
+      after do
+        File.delete(FAKE_PATH_STATS) if File.exist?(FAKE_PATH_STATS)
       end
 
       it 'call #save method' do
@@ -115,7 +126,7 @@ module Codebreaker
       it 'statistics should exist' do
         allow(console).to receive(:puts)
         console.send(:save_statistics)
-        expect(File.exist?(path_stats)).to eq(true)
+        expect(File.exist?(FAKE_PATH_STATS)).to eq(true)
       end
     end
   end

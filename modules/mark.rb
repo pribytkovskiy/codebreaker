@@ -1,16 +1,16 @@
 module Codebreaker
   class Mark
     class << self
-      def mark
-        mark_plus
+      def mark(game)
+        mark_plus(array_input_code, secret_code)
         mark_minus
       end
 
       private
 
       def mark_plus
-        @array_code = Array.new(@array_input_code)
-        @array_secret_code = Array.new(secret_code)
+        array_code = Array.new(game.array_input_code)
+        array_secret_code = Array.new(game.secret_code)
         @answer = []
         @array_code.zip(@array_secret_code).each_with_index do |(code, secret_code), i|
           next if code != secret_code
