@@ -69,23 +69,6 @@ module Codebreaker
           expect(game.instance_variable_get(:@secret_code).join).to match(/\A[1-6]{4}\Z/)
         end
       end
-
-      context 'when #mark' do
-        [[[1, 2, 2, 1], '2332', '--'], [[1, 2, 1, 1], '1121', '++--'],
-         [[1, 2, 2, 2],  '2335', '-'],    [[1, 5, 5, 1], '1124', '+-'],
-         [[5, 6, 5, 6],  '1221', ''],     [[4, 4, 1, 5], '5514', '+--'],
-         [[1, 1, 1, 0],  '1111', '+++'], [[1, 2, 3, 4], '4321]', '----'],
-         [[5, 5, 1, 4],  '4415', '+--'],  [[1, 2, 1, 1], '2112', '+--'],
-         [[3, 1, 3, 1],  '1313', '----'], [[1, 2, 3, 4], '1255', '++'],
-         [[3, 4, 1, 1],  '1124', '---'],  [[5, 5, 5, 1], '5133', '+-'],
-         [[1, 4, 1, 5],  '4115', '++--'], [[2, 3, 1, 5], '4115', '++']].each do |item|
-          it "Secret code is #{item[0]}, guess #{item[1]}, return #{item[2]}" do
-            game.instance_variable_set(:@secret_code, item[0])
-            game.instance_variable_set(:@game_status, :game)
-            expect(game.game_process(item[1])).to eq(item[2])
-          end
-        end
-      end
     end
 
     context 'when #hint' do

@@ -50,7 +50,7 @@ module Codebreaker
     end
 
     def mark
-      Codebreaker::Mark.mark_plus(array_input_code, secret_code)
+      Codebreaker::Mark.call(array_input_code, secret_code)
     end
   end
 end

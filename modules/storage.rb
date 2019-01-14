@@ -14,11 +14,7 @@ module Codebreaker
       end
 
       def open_statistics
-        if File.file?(PATH_STATS)
-          File.open(PATH_STATS, &:read)
-        else
-          STATUS[:no_file]
-        end
+        File.file?(PATH_STATS) ? File.open(PATH_STATS, &:read) : STATUS[:no_file]
       end
 
       def open_rules
